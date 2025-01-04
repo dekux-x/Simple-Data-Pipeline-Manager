@@ -296,5 +296,25 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  clickhouse-server:
+    image: clickhouse/clickhouse-server:latest
+    container_name: magnum-clickhouse-server
+    restart: always
+    ports:
+      - "8123:8123" # HTTP interface
+      - "9000:9000" # Native client interface
+    environment:
+      CLICKHOUSE_DB: magnum_db
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:8123/ || exit 1"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - clickhouse-config:/etc/clickhouse-server
+
 volumes:
   postgres-db-volume:
+  clickhouse-data:
+  clickhouse-config:
